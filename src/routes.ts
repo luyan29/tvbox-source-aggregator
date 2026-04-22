@@ -5,6 +5,7 @@ import type { Storage } from './storage/interface';
 import type { AppConfig, SourceEntry, MacCMSSourceEntry, LiveSourceEntry, NameTransformConfig } from './core/types';
 import { KV_MERGED_CONFIG, KV_MERGED_CONFIG_FULL, KV_MANUAL_SOURCES, KV_LAST_UPDATE, KV_MACCMS_SOURCES, KV_LIVE_SOURCES, KV_BLACKLIST, LIVE_PROXY_TTL, KV_INLINE_PREFIX, KV_NAME_TRANSFORM } from './core/config';
 import { parseConfigJson, isMultiRepoConfig, extractMultiRepoEntries } from './core/fetcher';
+import { decodeConfigResponse } from './core/decoder';
 import { validateMacCMS } from './core/maccms';
 import { lookupJarUrl, isMd5Key } from './core/jar-proxy';
 import { lookupLiveUrl } from './core/live-source';
@@ -120,15 +121,23 @@ export function createApp(deps: AppDeps): Hono {
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
-    let body: { name?: string; url?: string };
+    let body: { name?: string; url?: string; configKey?: string };
     try {
       body = await c.req.json();
     } catch {
       return c.json({ error: 'Invalid JSON' }, 400);
     }
 
-    const url = body.url?.trim();
+    let url = body.url?.trim() || '';
     if (!url) return c.json({ error: 'URL is required' }, 400);
+
+    // 自动提取 ;pk; 密钥
+    let configKey = body.configKey?.trim() || '';
+    const pkMatch = url.match(/;pk;(.+)$/);
+    if (pkMatch) {
+      configKey = configKey || pkMatch[1];
+      url = url.replace(/;pk;.+$/, '');
+    }
 
     try {
       new URL(url);
@@ -144,7 +153,9 @@ export function createApp(deps: AppDeps): Hono {
       return c.json({ error: 'Source already exists' }, 409);
     }
 
-    sources.push({ name, url });
+    const entry: SourceEntry = { name, url };
+    if (configKey) entry.configKey = configKey;
+    sources.push(entry);
     await storage.put(KV_MANUAL_SOURCES, JSON.stringify(sources));
 
     return c.json({ success: true });
@@ -194,14 +205,24 @@ export function createApp(deps: AppDeps): Hono {
     let jsonText: string;
     let sourceUrl: string | null = null;
 
+    // 自动提取 ;pk; 密钥
+    let configKey: string | undefined;
+    let fetchUrl = input;
     if (isUrl) {
-      sourceUrl = input;
+      const pkMatch = input.match(/;pk;(.+)$/);
+      if (pkMatch) {
+        configKey = pkMatch[1];
+        fetchUrl = input.replace(/;pk;.+$/, '');
+      }
+      sourceUrl = fetchUrl;
       try {
-        const resp = await fetch(input, {
+        const resp = await fetch(fetchUrl, {
           headers: { 'Accept': 'application/json, text/plain, */*', 'User-Agent': 'okhttp/3.12.0' },
         });
         if (!resp.ok) return c.json({ error: `Fetch failed: HTTP ${resp.status}` }, 502);
-        jsonText = await resp.text();
+        const buffer = await resp.arrayBuffer();
+        const decoded = await decodeConfigResponse(buffer, configKey);
+        jsonText = decoded || '';
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         return c.json({ error: `Fetch failed: ${msg}` }, 502);
@@ -244,7 +265,9 @@ export function createApp(deps: AppDeps): Hono {
         if (existingUrls.has(sourceUrl)) {
           return c.json({ type: 'single', added: 0, duplicates: 1, sources: [] });
         }
-        sources.push({ name: 'Imported', url: sourceUrl });
+        const entry: SourceEntry = { name: 'Imported', url: sourceUrl };
+        if (configKey) entry.configKey = configKey;
+        sources.push(entry);
         await storage.put(KV_MANUAL_SOURCES, JSON.stringify(sources));
         return c.json({ type: 'single', added: 1, duplicates: 0, sources: [sourceUrl] });
       } else {

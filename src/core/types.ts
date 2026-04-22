@@ -92,6 +92,7 @@ export interface LiveSourceEntry {
 export interface SourceEntry {
   name: string;
   url: string;
+  configKey?: string; // AES ECB 解密密钥（来自 URL 的 ;pk; 后缀）
 }
 
 // 内部处理用：带来源标记的配置

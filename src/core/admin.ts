@@ -561,6 +561,7 @@ body::before{
     <div class="add-form">
       <input class="name-input" type="text" id="addName" placeholder="Name (optional)" data-i18n-placeholder="nameOptional">
       <input type="url" id="addUrl" placeholder="TVBox config JSON URL" data-i18n-placeholder="configJsonUrl">
+      <input class="name-input" type="text" id="addConfigKey" placeholder="Config Key (optional, for AES ECB)">
       <button class="btn" id="addBtn" onclick="addSource()" data-i18n="add">Add</button>
     </div>
   </div>
@@ -899,7 +900,7 @@ async function loadSources() {
     list.innerHTML = sources.map(s => \`
       <div class="source-item">
         <div class="source-info">
-          <div class="source-name">\${esc(s.name || 'Unnamed')}</div>
+          <div class="source-name">\${esc(s.name || 'Unnamed')}\${s.configKey ? ' 🔑' : ''}</div>
           <div class="source-url">\${esc(s.url)}</div>
         </div>
         <div class="source-actions">
@@ -923,22 +924,26 @@ async function addSource() {
   const url = $('addUrl').value.trim();
   if (!url) { $('addUrl').focus(); return; }
   const name = $('addName').value.trim() || '';
+  const configKey = $('addConfigKey').value.trim() || '';
 
   const btn = $('addBtn');
   btn.textContent = t('adding');
   btn.className = 'btn loading';
 
   try {
+    const payload = { name, url };
+    if (configKey) payload.configKey = configKey;
     const res = await authFetch('/admin/sources', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, url })
+      body: JSON.stringify(payload)
     });
     const d = await res.json();
     if (res.ok) {
       toast(t('sourceAdded'));
       $('addUrl').value = '';
       $('addName').value = '';
+      $('addConfigKey').value = '';
       loadSources();
     } else {
       toast(d.error || t('failedLoad'), 'error');

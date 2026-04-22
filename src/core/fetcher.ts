@@ -1,6 +1,7 @@
 // 批量 fetch TVBox JSON 配置
 
 import { DEFAULT_FETCH_TIMEOUT_MS } from './config';
+import { decodeConfigResponse } from './decoder';
 import type { TVBoxConfig, SourcedConfig, SourceEntry } from './types';
 
 const MAX_MULTI_REPO_DEPTH = 3; // 多仓最大展开深度
@@ -101,10 +102,15 @@ async function fetchSingleConfig(
       return null;
     }
 
-    const text = await response.text();
-    const config = parseConfigJson(text);
+    const buffer = await response.arrayBuffer();
+    const decoded = await decodeConfigResponse(buffer, source.configKey);
+    if (!decoded) {
+      console.warn(`[fetcher] ${source.url} returned undecodable content`);
+      return null;
+    }
+    const config = parseConfigJson(decoded);
     if (!config) {
-      console.warn(`[fetcher] ${source.url} returned invalid JSON`);
+      console.warn(`[fetcher] ${source.url} returned invalid JSON after decoding`);
       return null;
     }
 
