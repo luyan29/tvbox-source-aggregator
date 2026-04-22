@@ -1,3 +1,6 @@
+import { sharedStyles } from './shared-styles';
+import { sharedUi } from './shared-ui';
+
 export const adminHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -5,252 +8,52 @@ export const adminHtml = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TVBox Aggregator - Admin</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap');
+${sharedStyles}
 
-*{margin:0;padding:0;box-sizing:border-box}
-
-:root{
-  --bg:#0a0e14;
-  --surface:#111720;
-  --surface-2:#161d2a;
-  --border:#1e2a3a;
-  --border-glow:#2a3f5f;
-  --green:#00e5a0;
-  --green-dim:#00e5a033;
-  --green-glow:#00e5a066;
-  --amber:#f0a030;
-  --amber-dim:#f0a03033;
-  --red:#ff4060;
-  --red-dim:#ff406033;
-  --blue:#4da6ff;
-  --blue-dim:#4da6ff33;
-  --text:#c8d6e5;
-  --text-dim:#5a6d82;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'Outfit',sans-serif;
-}
-
-html{font-size:16px}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--sans);
-  min-height:100vh;
-  overflow-x:hidden;
-  position:relative;
-}
-
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
-  pointer-events:none;
-  z-index:1000;
-}
-
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, #00e5a008 0%, transparent 70%),
-    linear-gradient(rgba(30,42,58,0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30,42,58,0.3) 1px, transparent 1px);
-  background-size:100% 100%, 60px 60px, 60px 60px;
-  pointer-events:none;
-  z-index:0;
-}
-
-.container{
-  max-width:860px;
-  margin:0 auto;
-  padding:40px 24px 80px;
-  position:relative;
-  z-index:1;
-}
-
-/* Login overlay */
-.login-overlay{
-  position:fixed;
-  inset:0;
-  background:var(--bg);
-  z-index:900;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.login-box{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:40px;
-  width:360px;
-  max-width:90vw;
-  animation:fadeSlideUp 0.4s ease-out;
-}
-
-.login-box h2{
-  font-family:var(--sans);
-  font-size:1.4rem;
-  font-weight:700;
-  color:#fff;
-  margin-bottom:8px;
-}
-
-.login-box p{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  color:var(--text-dim);
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  margin-bottom:24px;
-}
-
-.login-box input{
-  width:100%;
-  font-family:var(--mono);
-  font-size:0.85rem;
-  padding:12px 16px;
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:4px;
-  color:#fff;
-  outline:none;
-  margin-bottom:16px;
-  transition:border-color 0.2s;
-}
-
-.login-box input:focus{
-  border-color:var(--green);
-}
-
-.login-box .error-msg{
-  font-family:var(--mono);
-  font-size:0.75rem;
-  color:var(--red);
-  margin-bottom:12px;
-  display:none;
-}
-
-/* Header */
-.header{
-  margin-bottom:36px;
-  animation:fadeSlideDown 0.6s ease-out;
-}
-
-.header-label{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.2em;
-  text-transform:uppercase;
-  color:var(--green);
-  opacity:0.7;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.header-label::before{
-  content:'';
-  display:inline-block;
-  width:8px;height:8px;
-  background:var(--green);
-  border-radius:50%;
-  animation:pulse 2s ease-in-out infinite;
-}
-
-.header-title{
-  font-family:var(--sans);
-  font-size:2rem;
-  font-weight:700;
-  letter-spacing:-0.02em;
-  color:#fff;
-  line-height:1.2;
-}
-
-.header-title span{color:var(--green)}
-
-.header-nav{
-  display:flex;
-  gap:12px;
-  margin-top:16px;
-}
-
-.header-nav a{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--text-dim);
-  text-decoration:none;
-  padding:4px 10px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  transition:all 0.2s;
-}
-
-.header-nav a:hover{
-  border-color:var(--text-dim);
-  color:var(--text);
-}
-
-/* Section cards */
-.section{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:24px;
-  margin-bottom:20px;
-  position:relative;
-  overflow:hidden;
-  animation:fadeSlideUp 0.5s ease-out both;
-}
-
-.section:nth-child(2){animation-delay:0.1s}
-.section:nth-child(3){animation-delay:0.15s}
-.section:nth-child(4){animation-delay:0.2s}
-
-.section::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;
-  height:1px;
-  background:linear-gradient(90deg, transparent, var(--green-dim), transparent);
-}
-
-.section-title{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.15em;
-  text-transform:uppercase;
-  color:var(--text-dim);
-  margin-bottom:16px;
+/* Admin-specific: action bar in header */
+.agg-bar{
   display:flex;
   align-items:center;
   justify-content:space-between;
-}
-
-.section-title .count{
+  gap:12px;
+  margin-top:16px;
+  padding:12px 16px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:6px;
+  font-family:var(--mono);
   font-size:0.75rem;
-  color:var(--green);
-  font-weight:600;
+  color:var(--text-dim);
 }
 
-/* Add source form */
-.add-form{
-  display:flex;
+.agg-bar .status-text{font-family:var(--mono);font-size:0.75rem;color:var(--text-dim)}
+.agg-bar .status-text.success{color:var(--green)}
+.agg-bar .status-text.error{color:var(--red)}
+
+/* Inline form label */
+.form-label{
+  font-family:var(--mono);
+  font-size:0.65rem;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  display:block;
+  margin-bottom:4px;
+}
+
+/* Name transform grid */
+.nt-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
   gap:10px;
-  margin-bottom:8px;
+  margin-bottom:10px;
 }
 
-.add-form input{
-  flex:1;
+.nt-input{
+  width:100%;
   font-family:var(--mono);
   font-size:0.8rem;
-  padding:10px 14px;
+  padding:8px 12px;
   background:var(--bg);
   border:1px solid var(--border);
   border-radius:4px;
@@ -259,262 +62,58 @@ body::before{
   transition:border-color 0.2s;
 }
 
-.add-form input:focus{
-  border-color:var(--green);
+.nt-input:focus{border-color:var(--green)}
+
+.nt-textarea{
+  width:100%;
+  min-height:60px;
+  font-family:var(--mono);
+  font-size:0.75rem;
+  padding:8px 12px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:4px;
+  color:#fff;
+  resize:vertical;
+  outline:none;
 }
 
-.add-form input::placeholder{
-  color:var(--text-dim);
-  opacity:0.6;
+.nt-textarea:focus{border-color:var(--green)}
+
+/* Import textarea */
+.import-textarea{
+  width:100%;
+  min-height:100px;
+  font-family:var(--mono);
+  font-size:0.75rem;
+  padding:10px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:4px;
+  color:#fff;
+  resize:vertical;
+  margin-bottom:8px;
 }
 
-.add-form .name-input{
-  max-width:160px;
+/* Batch textarea */
+.batch-textarea{
+  width:100%;
+  margin-top:8px;
+  min-height:120px;
+  font-family:var(--mono);
+  font-size:0.75rem;
+  padding:10px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:4px;
+  color:#fff;
+  resize:vertical;
 }
 
 @media(max-width:560px){
-  .add-form{flex-wrap:wrap}
-  .add-form .name-input{max-width:100%}
-}
-
-/* Buttons */
-.btn{
-  font-family:var(--mono);
-  font-size:0.75rem;
-  font-weight:600;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  padding:10px 20px;
-  background:transparent;
-  border:1px solid var(--green);
-  color:var(--green);
-  border-radius:4px;
-  cursor:pointer;
-  transition:all 0.3s;
-  white-space:nowrap;
-}
-
-.btn:hover{
-  background:var(--green-dim);
-  box-shadow:0 0 20px var(--green-dim);
-}
-
-.btn:active{transform:scale(0.97)}
-
-.btn.loading{
-  color:var(--amber);
-  border-color:var(--amber);
-  pointer-events:none;
-}
-
-.btn-danger{
-  border-color:var(--red);
-  color:var(--red);
-}
-
-.btn-danger:hover{
-  background:var(--red-dim);
-  box-shadow:0 0 20px var(--red-dim);
-}
-
-.btn-sm{
-  padding:6px 12px;
-  font-size:0.65rem;
-}
-
-/* Source list */
-.source-list{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.source-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px 16px;
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:4px;
-  transition:border-color 0.2s;
-}
-
-.source-item:hover{
-  border-color:var(--border-glow);
-}
-
-.source-tag{
-  font-family:var(--mono);
-  font-size:0.6rem;
-  font-weight:600;
-  letter-spacing:0.08em;
-  text-transform:uppercase;
-  padding:3px 8px;
-  border-radius:3px;
-  flex-shrink:0;
-}
-
-.source-tag.scraped{
-  background:var(--blue-dim);
-  color:var(--blue);
-  border:1px solid var(--blue);
-}
-
-.source-tag.manual{
-  background:var(--green-dim);
-  color:var(--green);
-  border:1px solid var(--green);
-}
-
-.source-info{
-  flex:1;
-  min-width:0;
-  overflow:hidden;
-}
-
-.source-name{
-  font-family:var(--sans);
-  font-size:0.85rem;
-  color:#fff;
-  font-weight:500;
-  margin-bottom:2px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.source-url{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  color:var(--text-dim);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.source-actions{
-  flex-shrink:0;
-}
-
-/* Action bar */
-.action-bar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.action-bar .status-text{
-  font-family:var(--mono);
-  font-size:0.75rem;
-  color:var(--text-dim);
-}
-
-.action-bar .status-text.success{color:var(--green)}
-.action-bar .status-text.error{color:var(--red)}
-
-/* Empty state */
-.empty{
-  text-align:center;
-  padding:32px 16px;
-  font-family:var(--mono);
-  font-size:0.8rem;
-  color:var(--text-dim);
-}
-
-/* Toast */
-.toast{
-  position:fixed;
-  bottom:24px;
-  right:24px;
-  font-family:var(--mono);
-  font-size:0.75rem;
-  padding:12px 20px;
-  border-radius:4px;
-  z-index:999;
-  animation:fadeSlideUp 0.3s ease-out;
-  transition:opacity 0.3s;
-}
-
-.toast.success{
-  background:var(--green-dim);
-  border:1px solid var(--green);
-  color:var(--green);
-}
-
-.toast.error{
-  background:var(--red-dim);
-  border:1px solid var(--red);
-  color:var(--red);
-}
-
-/* Header top row */
-.header-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-/* Language toggle */
-.lang-toggle{
-  font-family:var(--mono);
-  font-size:0.65rem;
-  font-weight:500;
-  padding:4px 10px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  background:transparent;
-  color:var(--text-dim);
-  cursor:pointer;
-  transition:all 0.2s;
-  letter-spacing:0.05em;
-}
-
-.lang-toggle:hover{
-  border-color:var(--text-dim);
-  color:var(--text);
-}
-
-/* Footer */
-.footer{
-  margin-top:36px;
-  padding-top:20px;
-  border-top:1px solid var(--border);
-  font-family:var(--mono);
-  font-size:0.65rem;
-  color:var(--text-dim);
-  text-align:center;
-  letter-spacing:0.05em;
-}
-
-/* Loading skeleton */
-.skeleton{
-  background:linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);
-  background-size:200% 100%;
-  animation:shimmer 1.5s infinite;
-  border-radius:4px;
-  color:transparent !important;
-}
-
-@keyframes fadeSlideDown{
-  from{opacity:0;transform:translateY(-12px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-@keyframes fadeSlideUp{
-  from{opacity:0;transform:translateY(12px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-@keyframes pulse{
-  0%,100%{opacity:1}
-  50%{opacity:0.4}
-}
-
-@keyframes shimmer{
-  0%{background-position:200% 0}
-  100%{background-position:-200% 0}
+  .nt-grid{grid-template-columns:1fr}
+  .tabs{overflow-x:auto;flex-wrap:nowrap}
+  .tab{padding:12px 14px;font-size:0.65rem}
 }
 </style>
 </head>
@@ -527,7 +126,7 @@ body::before{
     <p data-i18n="loginSubtitle">TVBox Aggregator Management</p>
     <div class="error-msg" id="loginError" data-i18n="invalidToken">Invalid token</div>
     <input type="password" id="loginInput" placeholder="Enter admin token" data-i18n-placeholder="enterToken" autocomplete="off">
-    <button class="btn" style="width:100%" onclick="doLogin()" data-i18n="login">Login</button>
+    <button class="btn" style="width:100%" onclick="auth.doLogin()" data-i18n="login">Login</button>
   </div>
 </div>
 
@@ -536,128 +135,159 @@ body::before{
   <header class="header">
     <div class="header-top">
       <div class="header-label" data-i18n="headerLabel">Admin Console</div>
-      <button class="lang-toggle" id="langToggle" onclick="toggleLang()">中文</button>
+      <button class="lang-toggle" id="langToggle" onclick="doToggleLang()">中文</button>
     </div>
     <h1 class="header-title">Source <span>Manager</span></h1>
     <nav class="header-nav">
       <a href="/admin/config-editor" data-i18n="navConfigEditor">Config Editor</a>
       <a href="/status" data-i18n="navDashboard">Dashboard</a>
     </nav>
+    <!-- Aggregation status bar -->
+    <div class="agg-bar">
+      <span class="status-text" id="aggStatus" data-i18n="loadingStatus">Loading...</span>
+      <button class="btn btn-sm" id="refreshBtn" onclick="triggerRefresh()" data-i18n="refresh">Refresh</button>
+    </div>
   </header>
 
-  <!-- Import config -->
-  <div class="section">
-    <div class="section-title" data-i18n="importConfig">Import Config</div>
-    <textarea id="importInput" style="width:100%;min-height:100px;font-family:var(--mono);font-size:0.75rem;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:#fff;resize:vertical;margin-bottom:8px" placeholder="Paste TVBox JSON or URL here..." data-i18n-placeholder="importPlaceholder"></textarea>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn" id="importBtn" onclick="importConfig()" data-i18n="import">Import</button>
-      <span class="status-text" id="importResult" style="font-family:var(--mono);font-size:0.75rem"></span>
-    </div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="sources" onclick="switchTab('sources')"><span data-i18n="tabSources">Sources</span> <span class="badge" id="badgeSources">0</span></div>
+    <div class="tab" data-tab="maccms" onclick="switchTab('maccms')"><span data-i18n="tabMacCMS">MacCMS</span> <span class="badge" id="badgeMacCMS">0</span></div>
+    <div class="tab" data-tab="live" onclick="switchTab('live')"><span data-i18n="tabLive">Live</span> <span class="badge" id="badgeLive">0</span></div>
+    <div class="tab" data-tab="settings" onclick="switchTab('settings')"><span data-i18n="tabSettings">Settings</span></div>
   </div>
 
-  <!-- Add source -->
-  <div class="section">
-    <div class="section-title" data-i18n="addSource">Add Source</div>
-    <div class="add-form">
-      <input class="name-input" type="text" id="addName" placeholder="Name (optional)" data-i18n-placeholder="nameOptional">
-      <input type="url" id="addUrl" placeholder="TVBox config JSON URL" data-i18n-placeholder="configJsonUrl">
-      <input class="name-input" type="text" id="addConfigKey" placeholder="Config Key (optional, for AES ECB)">
-      <button class="btn" id="addBtn" onclick="addSource()" data-i18n="add">Add</button>
-    </div>
-  </div>
-
-  <!-- Aggregation control -->
-  <div class="section">
-    <div class="section-title" data-i18n="aggregation">Aggregation</div>
-    <div class="action-bar">
-      <span class="status-text" id="aggStatus" data-i18n="loadingStatus">Loading...</span>
-      <button class="btn" id="refreshBtn" onclick="triggerRefresh()" data-i18n="refresh">Refresh</button>
-    </div>
-  </div>
-
-  <!-- Source list -->
-  <div class="section">
-    <div class="section-title">
-      <span data-i18n="sourcesList">Sources</span>
-      <span class="count" id="sourceCount">0</span>
-    </div>
-    <div class="source-list" id="sourceList">
-      <div class="empty">Loading sources...</div>
-    </div>
-  </div>
-
-  <!-- MacCMS Add -->
-  <div class="section">
-    <div class="section-title" data-i18n="addMacCMS">Add MacCMS Source</div>
-    <div class="add-form">
-      <input class="name-input" type="text" id="mcKey" placeholder="Key (e.g. hongniuzy)" data-i18n-placeholder="mcKeyPh">
-      <input class="name-input" type="text" id="mcName" placeholder="Name" data-i18n-placeholder="mcNamePh">
-      <input type="url" id="mcApi" placeholder="MacCMS API URL" data-i18n-placeholder="mcApiPh">
-      <button class="btn" id="mcAddBtn" onclick="addMacCMS()" data-i18n="add">Add</button>
-    </div>
-    <div style="margin-top:8px;display:flex;gap:8px">
-      <button class="btn btn-sm" onclick="showBatchImport()" data-i18n="batchImport">Batch Import</button>
-    </div>
-    <textarea id="mcBatchInput" style="display:none;width:100%;margin-top:8px;min-height:120px;font-family:var(--mono);font-size:0.75rem;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:#fff;resize:vertical" placeholder='[{"key":"...","name":"...","api":"..."}]'></textarea>
-    <button class="btn btn-sm" id="mcBatchBtn" style="display:none;margin-top:8px" onclick="batchImportMacCMS()" data-i18n="submitBatch">Submit Batch</button>
-  </div>
-
-  <!-- MacCMS list -->
-  <div class="section">
-    <div class="section-title">
-      <span data-i18n="macCMSSources">MacCMS Sources</span>
-      <span class="count" id="mcCount">0</span>
-    </div>
-    <div class="source-list" id="mcList">
-      <div class="empty">Loading MacCMS sources...</div>
-    </div>
-  </div>
-
-  <!-- Live Sources Add -->
-  <div class="section">
-    <div class="section-title" data-i18n="addLiveSource">Add Live Source</div>
-    <div class="add-form">
-      <input class="name-input" type="text" id="liveName" placeholder="Name (e.g. iptv365)" data-i18n-placeholder="liveNamePh">
-      <input type="url" id="liveUrl" placeholder="m3u/txt URL" data-i18n-placeholder="liveUrlPh">
-      <button class="btn" id="liveAddBtn" onclick="addLive()" data-i18n="add">Add</button>
-    </div>
-  </div>
-
-  <!-- Live Sources list -->
-  <div class="section">
-    <div class="section-title">
-      <span data-i18n="liveSources">Live Sources</span>
-      <span class="count" id="liveCount">0</span>
-    </div>
-    <div class="source-list" id="liveList">
-      <div class="empty">Loading live sources...</div>
-    </div>
-  </div>
-
-  <!-- Name Transform -->
-  <div class="section">
-    <div class="section-title" data-i18n="nameTransform">Name Transform</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div>
-        <label style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:4px" data-i18n="ntPrefix">Prefix</label>
-        <input type="text" id="ntPrefix" style="width:100%;font-family:var(--mono);font-size:0.8rem;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:#fff;outline:none" placeholder="e.g. 【RioTV】" data-i18n-placeholder="ntPrefixPh">
+  <!-- Sources Tab -->
+  <div class="tab-panel active" id="panelSources">
+    <!-- Add source -->
+    <div class="section">
+      <div class="section-title" data-i18n="addSource">Add Source</div>
+      <div class="add-form">
+        <input class="name-input" type="text" id="addName" placeholder="Name (optional)" data-i18n-placeholder="nameOptional">
+        <input type="url" id="addUrl" placeholder="TVBox config JSON URL" data-i18n-placeholder="configJsonUrl">
+        <input class="name-input" type="text" id="addConfigKey" placeholder="Config Key (optional, for AES ECB)">
+        <button class="btn" id="addBtn" onclick="addSource()" data-i18n="add">Add</button>
       </div>
-      <div>
-        <label style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:4px" data-i18n="ntSuffix">Suffix</label>
-        <input type="text" id="ntSuffix" style="width:100%;font-family:var(--mono);font-size:0.8rem;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:#fff;outline:none" placeholder="e.g.  · Curated" data-i18n-placeholder="ntSuffixPh">
+      <!-- Import (collapsible) -->
+      <div class="collapsible-toggle" onclick="toggleCollapsible(this)" data-i18n="importConfig">Import Config</div>
+      <div class="collapsible-body">
+        <textarea id="importInput" class="import-textarea" placeholder="Paste TVBox JSON or URL here..." data-i18n-placeholder="importPlaceholder"></textarea>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-sm" id="importBtn" onclick="importConfig()" data-i18n="import">Import</button>
+          <span class="status-text" id="importResult" style="font-family:var(--mono);font-size:0.75rem"></span>
+        </div>
       </div>
     </div>
-    <div style="margin-bottom:10px">
-      <label style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:4px" data-i18n="ntPromoReplace">Promo Replacement (empty = delete)</label>
-      <input type="text" id="ntPromoReplace" style="width:100%;font-family:var(--mono);font-size:0.8rem;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:#fff;outline:none" placeholder="e.g. Premium" data-i18n-placeholder="ntPromoReplacePh">
+
+    <!-- Source list -->
+    <div class="section">
+      <div class="section-title">
+        <span data-i18n="sourcesList">Sources</span>
+        <span class="count" id="sourceCount">0</span>
+      </div>
+      <div class="source-list" id="sourceList">
+        <div class="empty">Loading sources...</div>
+      </div>
     </div>
-    <div style="margin-bottom:10px">
-      <label style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:4px" data-i18n="ntExtraPatterns">Extra Clean Patterns (one regex per line)</label>
-      <textarea id="ntExtraPatterns" style="width:100%;min-height:60px;font-family:var(--mono);font-size:0.75rem;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:#fff;resize:vertical;outline:none" placeholder="e.g. sponsor[：:]\\S+" data-i18n-placeholder="ntExtraPatternsPh"></textarea>
+  </div>
+
+  <!-- MacCMS Tab -->
+  <div class="tab-panel" id="panelMaccms">
+    <!-- Add MacCMS -->
+    <div class="section">
+      <div class="section-title" data-i18n="addMacCMS">Add MacCMS Source</div>
+      <div class="add-form">
+        <input class="name-input" type="text" id="mcKey" placeholder="Key (e.g. hongniuzy)" data-i18n-placeholder="mcKeyPh">
+        <input class="name-input" type="text" id="mcName" placeholder="Name" data-i18n-placeholder="mcNamePh">
+        <input type="url" id="mcApi" placeholder="MacCMS API URL" data-i18n-placeholder="mcApiPh">
+        <button class="btn" id="mcAddBtn" onclick="addMacCMS()" data-i18n="add">Add</button>
+      </div>
+      <!-- Batch import (collapsible) -->
+      <div class="collapsible-toggle" onclick="toggleCollapsible(this)" data-i18n="batchImport">Batch Import</div>
+      <div class="collapsible-body">
+        <textarea id="mcBatchInput" class="batch-textarea" placeholder='[{"key":"...","name":"...","api":"..."}]'></textarea>
+        <button class="btn btn-sm" style="margin-top:8px" id="mcBatchBtn" onclick="batchImportMacCMS()" data-i18n="submitBatch">Submit Batch</button>
+      </div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn" id="ntSaveBtn" onclick="saveNameTransform()" data-i18n="save">Save</button>
-      <span class="status-text" id="ntStatus" style="font-family:var(--mono);font-size:0.75rem"></span>
+
+    <!-- MacCMS list -->
+    <div class="section">
+      <div class="section-title">
+        <span data-i18n="macCMSSources">MacCMS Sources</span>
+        <span class="count" id="mcCount">0</span>
+      </div>
+      <div class="source-list" id="mcList">
+        <div class="empty">Loading MacCMS sources...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Tab -->
+  <div class="tab-panel" id="panelLive">
+    <!-- Add live source -->
+    <div class="section">
+      <div class="section-title" data-i18n="addLiveSource">Add Live Source</div>
+      <div class="add-form">
+        <input class="name-input" type="text" id="liveName" placeholder="Name (e.g. iptv365)" data-i18n-placeholder="liveNamePh">
+        <input type="url" id="liveUrl" placeholder="m3u/txt URL" data-i18n-placeholder="liveUrlPh">
+        <button class="btn" id="liveAddBtn" onclick="addLive()" data-i18n="add">Add</button>
+      </div>
+    </div>
+
+    <!-- Live list -->
+    <div class="section">
+      <div class="section-title">
+        <span data-i18n="liveSources">Live Sources</span>
+        <span class="count" id="liveCount">0</span>
+      </div>
+      <div class="source-list" id="liveList">
+        <div class="empty">Loading live sources...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div class="tab-panel" id="panelSettings">
+    <!-- Cron Interval -->
+    <div class="section">
+      <div class="section-title" data-i18n="cronInterval">Aggregation Schedule</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <select id="cronSelect" class="nt-input" style="width:auto;min-width:160px">
+          <option value="60" data-i18n-text="cronEvery1h">Every 1 hour</option>
+          <option value="180" data-i18n-text="cronEvery3h">Every 3 hours</option>
+          <option value="360" data-i18n-text="cronEvery6h">Every 6 hours</option>
+          <option value="720" data-i18n-text="cronEvery12h">Every 12 hours</option>
+          <option value="1440" data-i18n-text="cronEveryDay">Once a day</option>
+        </select>
+        <button class="btn btn-sm" id="cronSaveBtn" onclick="saveCronInterval()" data-i18n="save">Save</button>
+        <span class="status-text" id="cronStatus" style="font-family:var(--mono);font-size:0.75rem"></span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" data-i18n="nameTransform">Name Transform</div>
+      <div class="nt-grid">
+        <div>
+          <label class="form-label" data-i18n="ntPrefix">Prefix</label>
+          <input type="text" id="ntPrefix" class="nt-input" placeholder="e.g. 【RioTV】" data-i18n-placeholder="ntPrefixPh">
+        </div>
+        <div>
+          <label class="form-label" data-i18n="ntSuffix">Suffix</label>
+          <input type="text" id="ntSuffix" class="nt-input" placeholder="e.g.  · Curated" data-i18n-placeholder="ntSuffixPh">
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <label class="form-label" data-i18n="ntPromoReplace">Promo Replacement (empty = delete)</label>
+        <input type="text" id="ntPromoReplace" class="nt-input" placeholder="e.g. Premium" data-i18n-placeholder="ntPromoReplacePh">
+      </div>
+      <div style="margin-bottom:10px">
+        <label class="form-label" data-i18n="ntExtraPatterns">Extra Clean Patterns (one regex per line)</label>
+        <textarea id="ntExtraPatterns" class="nt-textarea" placeholder="e.g. sponsor[：:]\\S+" data-i18n-placeholder="ntExtraPatternsPh"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="ntSaveBtn" onclick="saveNameTransform()" data-i18n="save">Save</button>
+        <span class="status-text" id="ntStatus" style="font-family:var(--mono);font-size:0.75rem"></span>
+      </div>
     </div>
   </div>
 
@@ -667,6 +297,8 @@ body::before{
 </div>
 
 <script>
+${sharedUi}
+
 // --- i18n ---
 const translations = {
   en: {
@@ -674,6 +306,7 @@ const translations = {
     invalidToken:'Invalid token', enterToken:'Enter admin token', login:'Login',
     connectionFailed:'Connection failed',
     headerLabel:'Admin Console', navConfigEditor:'Config Editor', navDashboard:'Dashboard',
+    tabSources:'Sources', tabMacCMS:'MacCMS', tabLive:'Live', tabSettings:'Settings',
     addSource:'Add Source', aggregation:'Aggregation', sourcesList:'Sources',
     addMacCMS:'Add MacCMS Source', macCMSSources:'MacCMS Sources',
     addLiveSource:'Add Live Source', liveSources:'Live Sources',
@@ -687,11 +320,8 @@ const translations = {
     lastUpdate:'Last update: ', neverUpdated:'Never updated — click Refresh',
     failedLoadStatus:'Failed to load status',
     noSources:'No sources configured. Add one above.',
-    loadingSources:'Loading sources...',
     noMacCMS:'No MacCMS sources. Add one above.',
-    loadingMacCMS:'Loading MacCMS sources...',
     noLives:'No live sources. Add one above.',
-    loadingLives:'Loading live sources...',
     failedLoad:'Failed to load sources',
     failedLoadMacCMS:'Failed to load MacCMS sources',
     failedLoadLives:'Failed to load live sources',
@@ -701,7 +331,6 @@ const translations = {
     liveSourceAdded:'Live source added', removed:'Removed',
     invalidJson:'Invalid JSON', mustBeArray:'Must be a JSON array',
     allFieldsRequired:'All fields required', importFailed:'Import failed',
-
     aggregationStarted:'Aggregation started', refreshFailed:'Refresh failed',
     importConfig:'Import Config', import:'Import', importing:'Importing...',
     importPlaceholder:'Paste TVBox JSON or URL here...',
@@ -711,6 +340,9 @@ const translations = {
     ntPromoReplace:'Promo Replacement (empty = delete)', ntExtraPatterns:'Extra Clean Patterns (one regex per line)',
     ntPrefixPh:'e.g. 【RioTV】', ntSuffixPh:'e.g.  · Curated',
     ntPromoReplacePh:'e.g. Premium', ntExtraPatternsPh:'e.g. sponsor[：:]\\\\S+',
+    cronInterval:'Aggregation Schedule',
+    cronEvery1h:'Every 1 hour', cronEvery3h:'Every 3 hours', cronEvery6h:'Every 6 hours',
+    cronEvery12h:'Every 12 hours', cronEveryDay:'Once a day',
     save:'Save', saving:'Saving...', saved:'Saved', saveFailed:'Save failed',
     footer:'TVBox Source Aggregator &middot; Admin Console',
   },
@@ -719,6 +351,7 @@ const translations = {
     invalidToken:'无效的令牌', enterToken:'请输入管理令牌', login:'登录',
     connectionFailed:'连接失败',
     headerLabel:'管理控制台', navConfigEditor:'配置编辑', navDashboard:'仪表盘',
+    tabSources:'源', tabMacCMS:'MacCMS', tabLive:'直播', tabSettings:'设置',
     addSource:'添加源', aggregation:'聚合', sourcesList:'源列表',
     addMacCMS:'添加 MacCMS 源', macCMSSources:'MacCMS 源列表',
     addLiveSource:'添加直播源', liveSources:'直播源列表',
@@ -732,11 +365,8 @@ const translations = {
     lastUpdate:'上次更新: ', neverUpdated:'从未更新 — 点击刷新',
     failedLoadStatus:'获取状态失败',
     noSources:'暂无源。请在上方添加。',
-    loadingSources:'加载源中...',
     noMacCMS:'暂无 MacCMS 源。请在上方添加。',
-    loadingMacCMS:'加载 MacCMS 源中...',
     noLives:'暂无直播源。请在上方添加。',
-    loadingLives:'加载直播源中...',
     failedLoad:'加载源失败',
     failedLoadMacCMS:'加载 MacCMS 源失败',
     failedLoadLives:'加载直播源失败',
@@ -746,7 +376,6 @@ const translations = {
     liveSourceAdded:'直播源已添加', removed:'已删除',
     invalidJson:'无效的 JSON', mustBeArray:'必须是 JSON 数组',
     allFieldsRequired:'所有字段必填', importFailed:'导入失败',
-
     aggregationStarted:'聚合已开始', refreshFailed:'刷新失败',
     importConfig:'导入配置', import:'导入', importing:'导入中...',
     importPlaceholder:'粘贴 TVBox JSON 内容或 URL...',
@@ -756,101 +385,33 @@ const translations = {
     ntPromoReplace:'推广替换文字（留空则删除）', ntExtraPatterns:'额外清洗正则（每行一条）',
     ntPrefixPh:'如 【RioTV】', ntSuffixPh:'如  · 精选',
     ntPromoReplacePh:'如 精选推荐', ntExtraPatternsPh:'如 sponsor[：:]\\\\S+',
+    cronInterval:'聚合频率',
+    cronEvery1h:'每 1 小时', cronEvery3h:'每 3 小时', cronEvery6h:'每 6 小时',
+    cronEvery12h:'每 12 小时', cronEveryDay:'每天一次',
     save:'保存', saving:'保存中...', saved:'已保存', saveFailed:'保存失败',
     footer:'TVBox 源聚合器 &middot; 管理控制台',
   }
 };
 
-function getLang() {
-  const s = localStorage.getItem('lang');
-  if (s === 'en' || s === 'zh') return s;
-  return navigator.language?.startsWith('zh') ? 'zh' : 'en';
-}
-
 function t(key) { const l = getLang(); return translations[l]?.[key] || translations.en[key] || key; }
 
-function applyLang(lang) {
-  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const k = el.dataset.i18n;
-    const v = translations[lang]?.[k];
-    if (v) el.innerHTML = v;
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const k = el.dataset.i18nPlaceholder;
-    const v = translations[lang]?.[k];
-    if (v) el.placeholder = v;
-  });
-  const toggle = document.getElementById('langToggle');
-  if (toggle) toggle.textContent = lang === 'zh' ? 'EN' : '中文';
-  document.body.style.opacity = '1';
-}
-
-function toggleLang() {
+function doToggleLang() {
   const next = getLang() === 'zh' ? 'en' : 'zh';
   localStorage.setItem('lang', next);
-  applyLang(next);
+  applyLang(translations, next);
   loadAll();
 }
 
-let token = '';
-const $ = id => document.getElementById(id);
-
 // --- Auth ---
-function doLogin() {
-  token = $('loginInput').value.trim();
-  if (!token) return;
-  // Verify token by making a request
-  fetch('/admin/sources', {
-    headers: { 'Authorization': 'Bearer ' + token }
-  }).then(r => {
-    if (r.ok) {
-      $('loginOverlay').style.display = 'none';
-      $('mainContent').style.display = 'block';
-      sessionStorage.setItem('admin_token', token);
-      loadAll();
-    } else {
-      $('loginError').style.display = 'block';
-      $('loginInput').value = '';
-      $('loginInput').focus();
-    }
-  }).catch(() => {
-    $('loginError').textContent = t('connectionFailed');
-    $('loginError').style.display = 'block';
+const auth = initAuth('loginInput', 'loginError', 'loginOverlay', 'mainContent', '/admin/sources', loadAll);
+
+// --- Tab switching ---
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    const id = 'panel' + tab.charAt(0).toUpperCase() + tab.slice(1);
+    p.classList.toggle('active', p.id === id);
   });
-}
-
-$('loginInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
-// Auto-login from session
-const saved = sessionStorage.getItem('admin_token');
-if (saved) {
-  token = saved;
-  fetch('/admin/sources', {
-    headers: { 'Authorization': 'Bearer ' + token }
-  }).then(r => {
-    if (r.ok) {
-      $('loginOverlay').style.display = 'none';
-      $('mainContent').style.display = 'block';
-      loadAll();
-    }
-  });
-}
-
-// --- API helpers ---
-function authFetch(url, opts = {}) {
-  opts.headers = { ...opts.headers, 'Authorization': 'Bearer ' + token };
-  return fetch(url, opts);
-}
-
-function toast(msg, type = 'success') {
-  const el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2500);
 }
 
 // --- Load data ---
@@ -860,6 +421,7 @@ function loadAll() {
   loadLives();
   loadStatus();
   loadNameTransform();
+  loadCronInterval();
 }
 
 async function loadStatus() {
@@ -888,9 +450,10 @@ async function loadStatus() {
 async function loadSources() {
   const list = $('sourceList');
   try {
-    const res = await authFetch('/admin/sources');
+    const res = await auth.authFetch('/admin/sources');
     const sources = await res.json();
     $('sourceCount').textContent = sources.length;
+    $('badgeSources').textContent = sources.length;
 
     if (sources.length === 0) {
       list.innerHTML = '<div class="empty">' + t('noSources') + '</div>';
@@ -913,12 +476,6 @@ async function loadSources() {
   }
 }
 
-function esc(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
 // --- Add source ---
 async function addSource() {
   const url = $('addUrl').value.trim();
@@ -933,7 +490,7 @@ async function addSource() {
   try {
     const payload = { name, url };
     if (configKey) payload.configKey = configKey;
-    const res = await authFetch('/admin/sources', {
+    const res = await auth.authFetch('/admin/sources', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -959,7 +516,7 @@ async function addSource() {
 // --- Remove source ---
 async function removeSource(url) {
   try {
-    const res = await authFetch('/admin/sources', {
+    const res = await auth.authFetch('/admin/sources', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })
@@ -980,9 +537,10 @@ async function removeSource(url) {
 async function loadMacCMS() {
   const list = $('mcList');
   try {
-    const res = await authFetch('/admin/maccms');
+    const res = await auth.authFetch('/admin/maccms');
     const sources = await res.json();
     $('mcCount').textContent = sources.length;
+    $('badgeMacCMS').textContent = sources.length;
 
     if (sources.length === 0) {
       list.innerHTML = '<div class="empty">' + t('noMacCMS') + '</div>';
@@ -1018,7 +576,7 @@ async function addMacCMS() {
   btn.className = 'btn loading';
 
   try {
-    const res = await authFetch('/admin/maccms', {
+    const res = await auth.authFetch('/admin/maccms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key, name, api })
@@ -1041,7 +599,7 @@ async function addMacCMS() {
 
 async function removeMC(key) {
   try {
-    const res = await authFetch('/admin/maccms', {
+    const res = await auth.authFetch('/admin/maccms', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key })
@@ -1054,7 +612,7 @@ async function removeMC(key) {
 async function validateMC(api) {
   toast(t('testing'));
   try {
-    const res = await authFetch('/admin/maccms/validate', {
+    const res = await auth.authFetch('/admin/maccms/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ api })
@@ -1062,15 +620,6 @@ async function validateMC(api) {
     const d = await res.json();
     toast(d.valid ? t('valid') : t('invalidUnreachable'), d.valid ? 'success' : 'error');
   } catch { toast(t('networkError'), 'error'); }
-}
-
-function showBatchImport() {
-  const ta = $('mcBatchInput');
-  const btn = $('mcBatchBtn');
-  const show = ta.style.display === 'none';
-  ta.style.display = show ? 'block' : 'none';
-  btn.style.display = show ? 'inline-block' : 'none';
-  if (show) ta.focus();
 }
 
 async function batchImportMacCMS() {
@@ -1081,7 +630,7 @@ async function batchImportMacCMS() {
   if (!Array.isArray(data)) { toast(t('mustBeArray'), 'error'); return; }
 
   try {
-    const res = await authFetch('/admin/maccms', {
+    const res = await auth.authFetch('/admin/maccms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -1090,8 +639,6 @@ async function batchImportMacCMS() {
     if (res.ok) {
       toast('Imported ' + (d.added || 0) + ' source(s)');
       $('mcBatchInput').value = '';
-      $('mcBatchInput').style.display = 'none';
-      $('mcBatchBtn').style.display = 'none';
       loadMacCMS();
     } else {
       toast(d.error || t('importFailed'), 'error');
@@ -1103,9 +650,10 @@ async function batchImportMacCMS() {
 async function loadLives() {
   const list = $('liveList');
   try {
-    const res = await authFetch('/admin/lives');
+    const res = await auth.authFetch('/admin/lives');
     const entries = await res.json();
     $('liveCount').textContent = entries.length;
+    $('badgeLive').textContent = entries.length;
 
     if (entries.length === 0) {
       list.innerHTML = '<div class="empty">' + t('noLives') + '</div>';
@@ -1139,7 +687,7 @@ async function addLive() {
   btn.className = 'btn loading';
 
   try {
-    const res = await authFetch('/admin/lives', {
+    const res = await auth.authFetch('/admin/lives', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, url })
@@ -1163,7 +711,7 @@ async function addLive() {
 
 async function removeLive(url) {
   try {
-    const res = await authFetch('/admin/lives', {
+    const res = await auth.authFetch('/admin/lives', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url })
@@ -1181,11 +729,11 @@ async function importConfig() {
   const btn = $('importBtn');
   const result = $('importResult');
   btn.textContent = t('importing');
-  btn.className = 'btn loading';
+  btn.className = 'btn btn-sm loading';
   result.textContent = '';
 
   try {
-    const res = await authFetch('/admin/sources/import', {
+    const res = await auth.authFetch('/admin/sources/import', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ input })
@@ -1209,13 +757,13 @@ async function importConfig() {
   }
 
   btn.textContent = t('import');
-  btn.className = 'btn';
+  btn.className = 'btn btn-sm';
 }
 
 // --- Name Transform ---
 async function loadNameTransform() {
   try {
-    const res = await authFetch('/admin/name-transform');
+    const res = await auth.authFetch('/admin/name-transform');
     if (!res.ok) return;
     const d = await res.json();
     $('ntPrefix').value = d.prefix || '';
@@ -1236,7 +784,7 @@ async function saveNameTransform() {
   const extraCleanPatterns = extraRaw ? extraRaw.split('\\n').map(s => s.trim()).filter(Boolean) : [];
 
   try {
-    const res = await authFetch('/admin/name-transform', {
+    const res = await auth.authFetch('/admin/name-transform', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1264,14 +812,55 @@ async function saveNameTransform() {
   setTimeout(() => { status.textContent = ''; }, 3000);
 }
 
+// --- Cron Interval ---
+async function loadCronInterval() {
+  try {
+    const res = await auth.authFetch('/admin/cron-interval');
+    if (!res.ok) return;
+    const d = await res.json();
+    $('cronSelect').value = String(d.interval || 1440);
+  } catch {}
+}
+
+async function saveCronInterval() {
+  const btn = $('cronSaveBtn');
+  const status = $('cronStatus');
+  btn.textContent = t('saving');
+  btn.className = 'btn btn-sm loading';
+  status.textContent = '';
+
+  try {
+    const res = await auth.authFetch('/admin/cron-interval', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ interval: parseInt($('cronSelect').value) })
+    });
+    const d = await res.json();
+    if (res.ok) {
+      status.textContent = t('saved');
+      status.className = 'status-text success';
+    } else {
+      status.textContent = d.error || t('saveFailed');
+      status.className = 'status-text error';
+    }
+  } catch {
+    status.textContent = t('networkError');
+    status.className = 'status-text error';
+  }
+
+  btn.textContent = t('save');
+  btn.className = 'btn btn-sm';
+  setTimeout(() => { status.textContent = ''; }, 3000);
+}
+
 // --- Refresh ---
 async function triggerRefresh() {
   const btn = $('refreshBtn');
   btn.textContent = t('running');
-  btn.className = 'btn loading';
+  btn.className = 'btn btn-sm loading';
 
   try {
-    const res = await authFetch('/refresh', { method: 'POST' });
+    const res = await auth.authFetch('/refresh', { method: 'POST' });
     const d = await res.json();
     if (d.success) {
       toast(t('aggregationStarted'));
@@ -1285,10 +874,11 @@ async function triggerRefresh() {
 
   setTimeout(() => {
     btn.textContent = t('refresh');
-    btn.className = 'btn';
+    btn.className = 'btn btn-sm';
   }, 3000);
 }
-applyLang(getLang());
+
+applyLang(translations, getLang());
 </script>
 </body>
 </html>`;

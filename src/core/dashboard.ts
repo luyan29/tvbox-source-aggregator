@@ -1,3 +1,6 @@
+import { sharedStyles } from './shared-styles';
+import { sharedUi } from './shared-ui';
+
 export const dashboardHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -5,152 +8,11 @@ export const dashboardHtml = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TVBox Source Aggregator</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap');
+${sharedStyles}
 
-*{margin:0;padding:0;box-sizing:border-box}
+/* Dashboard-specific */
+.header{margin-bottom:48px}
 
-:root{
-  --bg:#0a0e14;
-  --surface:#111720;
-  --surface-2:#161d2a;
-  --border:#1e2a3a;
-  --border-glow:#2a3f5f;
-  --green:#00e5a0;
-  --green-dim:#00e5a033;
-  --green-glow:#00e5a066;
-  --amber:#f0a030;
-  --amber-dim:#f0a03033;
-  --red:#ff4060;
-  --red-dim:#ff406033;
-  --text:#c8d6e5;
-  --text-dim:#5a6d82;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'Outfit',sans-serif;
-}
-
-html{font-size:16px}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--sans);
-  min-height:100vh;
-  overflow-x:hidden;
-  position:relative;
-}
-
-/* Scan-line overlay */
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.03) 2px,
-    rgba(0,0,0,0.03) 4px
-  );
-  pointer-events:none;
-  z-index:1000;
-}
-
-/* Grid background */
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, #00e5a008 0%, transparent 70%),
-    linear-gradient(rgba(30,42,58,0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30,42,58,0.3) 1px, transparent 1px);
-  background-size:100% 100%, 60px 60px, 60px 60px;
-  pointer-events:none;
-  z-index:0;
-}
-
-.container{
-  max-width:860px;
-  margin:0 auto;
-  padding:40px 24px 80px;
-  position:relative;
-  z-index:1;
-}
-
-/* Header */
-.header{
-  margin-bottom:48px;
-  animation:fadeSlideDown 0.6s ease-out;
-}
-
-.header-label{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.2em;
-  text-transform:uppercase;
-  color:var(--green);
-  opacity:0.7;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.header-label::before{
-  content:'';
-  display:inline-block;
-  width:8px;height:8px;
-  background:var(--green);
-  border-radius:50%;
-  animation:pulse 2s ease-in-out infinite;
-}
-
-.header-title{
-  font-family:var(--sans);
-  font-size:2rem;
-  font-weight:700;
-  letter-spacing:-0.02em;
-  color:#fff;
-  line-height:1.2;
-}
-
-.header-title span{
-  color:var(--green);
-}
-
-/* Status bar */
-.status-bar{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin-top:16px;
-  font-family:var(--mono);
-  font-size:0.75rem;
-  color:var(--text-dim);
-}
-
-.status-indicator{
-  display:flex;align-items:center;gap:6px;
-  padding:4px 10px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:4px;
-}
-
-.status-dot{
-  width:6px;height:6px;
-  border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 6px var(--green-glow);
-  animation:pulse 2s ease-in-out infinite;
-}
-
-.status-dot.offline{
-  background:var(--red);
-  box-shadow:0 0 6px var(--red-dim);
-  animation:none;
-}
-
-/* Stats grid */
 .stats-grid{
   display:grid;
   grid-template-columns:repeat(2, 1fr);
@@ -293,9 +155,7 @@ body::before{
   box-shadow:0 0 20px var(--green-dim);
 }
 
-.refresh-btn:active{
-  transform:scale(0.97);
-}
+.refresh-btn:active{transform:scale(0.97)}
 
 .refresh-btn.loading{
   color:var(--amber);
@@ -388,106 +248,7 @@ body::before{
   border-color:var(--green);
 }
 
-/* Header top row */
-.header-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-/* Header nav */
-.header-nav{
-  display:flex;
-  gap:12px;
-  margin-top:16px;
-}
-
-.header-nav a{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--text-dim);
-  text-decoration:none;
-  padding:4px 10px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  transition:all 0.2s;
-}
-
-.header-nav a:hover{
-  border-color:var(--text-dim);
-  color:var(--text);
-}
-
-/* Language toggle */
-.lang-toggle{
-  font-family:var(--mono);
-  font-size:0.65rem;
-  font-weight:500;
-  padding:4px 10px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  background:transparent;
-  color:var(--text-dim);
-  cursor:pointer;
-  transition:all 0.2s;
-  letter-spacing:0.05em;
-}
-
-.lang-toggle:hover{
-  border-color:var(--text-dim);
-  color:var(--text);
-}
-
-/* Footer */
-.footer{
-  margin-top:48px;
-  padding-top:24px;
-  border-top:1px solid var(--border);
-  font-family:var(--mono);
-  font-size:0.65rem;
-  color:var(--text-dim);
-  text-align:center;
-  letter-spacing:0.05em;
-  animation:fadeSlideUp 0.5s ease-out 0.4s both;
-}
-
-/* Loading skeleton */
-.skeleton{
-  background:linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%);
-  background-size:200% 100%;
-  animation:shimmer 1.5s infinite;
-  border-radius:4px;
-  color:transparent !important;
-}
-
-/* Animations */
-@keyframes fadeSlideDown{
-  from{opacity:0;transform:translateY(-12px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-@keyframes fadeSlideUp{
-  from{opacity:0;transform:translateY(12px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-@keyframes pulse{
-  0%,100%{opacity:1}
-  50%{opacity:0.4}
-}
-
-@keyframes loading{
-  0%{width:0;left:0}
-  50%{width:100%;left:0}
-  100%{width:0;left:100%}
-}
-
-@keyframes shimmer{
-  0%{background-position:200% 0}
-  100%{background-position:-200% 0}
-}
+.footer{margin-top:48px;padding-top:24px}
 </style>
 </head>
 <body style="opacity:0">
@@ -496,7 +257,7 @@ body::before{
   <header class="header">
     <div class="header-top">
       <div class="header-label" data-i18n="headerLabel">System Monitor</div>
-      <button class="lang-toggle" id="langToggle" onclick="toggleLang()">中文</button>
+      <button class="lang-toggle" id="langToggle" onclick="doToggleLang()">中文</button>
     </div>
     <h1 class="header-title">TVBox <span>Aggregator</span></h1>
     <div class="status-bar">
@@ -573,9 +334,8 @@ body::before{
 </div>
 
 <script>
-const $ = id => document.getElementById(id);
+${sharedUi}
 
-// --- i18n ---
 const translations = {
   en: {
     headerLabel:'System Monitor', connecting:'Connecting...', sites:'Sites', lives:'Lives',
@@ -599,36 +359,13 @@ const translations = {
   }
 };
 
-function getLang() {
-  const s = localStorage.getItem('lang');
-  if (s === 'en' || s === 'zh') return s;
-  return navigator.language?.startsWith('zh') ? 'zh' : 'en';
-}
-
 function t(key) { const l = getLang(); return translations[l]?.[key] || translations.en[key] || key; }
 
-function applyLang(lang) {
-  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const k = el.dataset.i18n;
-    const v = translations[lang]?.[k];
-    if (v) el.innerHTML = v;
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const k = el.dataset.i18nPlaceholder;
-    const v = translations[lang]?.[k];
-    if (v) el.placeholder = v;
-  });
-  const toggle = $('langToggle');
-  if (toggle) toggle.textContent = lang === 'zh' ? 'EN' : '中文';
-  document.body.style.opacity = '1';
-}
-
-function toggleLang() {
+function doToggleLang() {
   const next = getLang() === 'zh' ? 'en' : 'zh';
   localStorage.setItem('lang', next);
-  applyLang(next);
-  loadStatus(); // re-render dynamic text
+  applyLang(translations, next);
+  loadStatus();
 }
 
 const configUrl = location.origin + '/';
@@ -718,7 +455,7 @@ function copyUrl(elementId) {
   });
 }
 
-applyLang(getLang());
+applyLang(translations, getLang());
 loadStatus();
 setInterval(loadStatus, 60000);
 </script>

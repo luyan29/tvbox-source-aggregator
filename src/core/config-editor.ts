@@ -1,3 +1,6 @@
+import { sharedStyles } from './shared-styles';
+import { sharedUi } from './shared-ui';
+
 export const configEditorHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -5,316 +8,10 @@ export const configEditorHtml = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TVBox Aggregator - Config Editor</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap');
+${sharedStyles}
 
-*{margin:0;padding:0;box-sizing:border-box}
-
-:root{
-  --bg:#0a0e14;
-  --surface:#111720;
-  --surface-2:#161d2a;
-  --border:#1e2a3a;
-  --border-glow:#2a3f5f;
-  --green:#00e5a0;
-  --green-dim:#00e5a033;
-  --green-glow:#00e5a066;
-  --amber:#f0a030;
-  --amber-dim:#f0a03033;
-  --red:#ff4060;
-  --red-dim:#ff406033;
-  --blue:#4da6ff;
-  --blue-dim:#4da6ff33;
-  --text:#c8d6e5;
-  --text-dim:#5a6d82;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'Outfit',sans-serif;
-}
-
-html{font-size:16px}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--sans);
-  min-height:100vh;
-  overflow-x:hidden;
-  position:relative;
-}
-
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
-  pointer-events:none;
-  z-index:1000;
-}
-
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, #00e5a008 0%, transparent 70%),
-    linear-gradient(rgba(30,42,58,0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30,42,58,0.3) 1px, transparent 1px);
-  background-size:100% 100%, 60px 60px, 60px 60px;
-  pointer-events:none;
-  z-index:0;
-}
-
-.container{
-  max-width:960px;
-  margin:0 auto;
-  padding:40px 24px 80px;
-  position:relative;
-  z-index:1;
-}
-
-/* Login overlay */
-.login-overlay{
-  position:fixed;
-  inset:0;
-  background:var(--bg);
-  z-index:900;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.login-box{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:40px;
-  width:360px;
-  max-width:90vw;
-  animation:fadeSlideUp 0.4s ease-out;
-}
-
-.login-box h2{
-  font-family:var(--sans);
-  font-size:1.4rem;
-  font-weight:700;
-  color:#fff;
-  margin-bottom:8px;
-}
-
-.login-box p{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  color:var(--text-dim);
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  margin-bottom:24px;
-}
-
-.login-box input{
-  width:100%;
-  font-family:var(--mono);
-  font-size:0.85rem;
-  padding:12px 16px;
-  background:var(--bg);
-  border:1px solid var(--border);
-  border-radius:4px;
-  color:#fff;
-  outline:none;
-  margin-bottom:16px;
-  transition:border-color 0.2s;
-}
-
-.login-box input:focus{border-color:var(--green)}
-
-.login-box .error-msg{
-  font-family:var(--mono);
-  font-size:0.75rem;
-  color:var(--red);
-  margin-bottom:12px;
-  display:none;
-}
-
-/* Header */
-.header{
-  margin-bottom:24px;
-  animation:fadeSlideDown 0.6s ease-out;
-}
-
-.header-label{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.2em;
-  text-transform:uppercase;
-  color:var(--green);
-  opacity:0.7;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.header-label::before{
-  content:'';
-  display:inline-block;
-  width:8px;height:8px;
-  background:var(--green);
-  border-radius:50%;
-  animation:pulse 2s ease-in-out infinite;
-}
-
-.header-title{
-  font-family:var(--sans);
-  font-size:2rem;
-  font-weight:700;
-  letter-spacing:-0.02em;
-  color:#fff;
-  line-height:1.2;
-}
-
-.header-title span{color:var(--green)}
-
-.header-nav{
-  display:flex;
-  gap:12px;
-  margin-top:16px;
-}
-
-.header-nav a{
-  font-family:var(--mono);
-  font-size:0.7rem;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  color:var(--text-dim);
-  text-decoration:none;
-  padding:4px 10px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  transition:all 0.2s;
-}
-
-.header-nav a:hover{
-  border-color:var(--text-dim);
-  color:var(--text);
-}
-
-/* Submit button */
-.btn{
-  font-family:var(--mono);
-  font-size:0.75rem;
-  font-weight:600;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  padding:10px 20px;
-  background:transparent;
-  border:1px solid var(--green);
-  color:var(--green);
-  border-radius:4px;
-  cursor:pointer;
-  transition:all 0.3s;
-  white-space:nowrap;
-}
-
-.btn:hover{
-  background:var(--green-dim);
-  box-shadow:0 0 20px var(--green-dim);
-}
-
-.btn:active{transform:scale(0.97)}
-
-.btn.danger{
-  border-color:var(--red);
-  color:var(--red);
-}
-
-.btn.danger:hover{
-  background:var(--red-dim);
-  box-shadow:0 0 20px var(--red-dim);
-}
-
-.btn.secondary{
-  border-color:var(--amber);
-  color:var(--amber);
-}
-
-.btn.secondary:hover{
-  background:var(--amber-dim);
-  box-shadow:0 0 20px var(--amber-dim);
-}
-
-.btn.sm{
-  padding:5px 10px;
-  font-size:0.65rem;
-}
-
-/* Tabs */
-.tabs{
-  display:flex;
-  gap:0;
-  margin-bottom:20px;
-  border-bottom:1px solid var(--border);
-}
-
-.tab{
-  font-family:var(--mono);
-  font-size:0.75rem;
-  font-weight:500;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  padding:12px 20px;
-  color:var(--text-dim);
-  cursor:pointer;
-  border-bottom:2px solid transparent;
-  transition:all 0.2s;
-  user-select:none;
-}
-
-.tab:hover{color:var(--text)}
-
-.tab.active{
-  color:var(--green);
-  border-bottom-color:var(--green);
-}
-
-.tab .badge{
-  display:inline-block;
-  font-size:0.6rem;
-  padding:1px 6px;
-  border-radius:8px;
-  margin-left:6px;
-  background:var(--surface-2);
-  color:var(--text-dim);
-}
-
-.tab.active .badge{
-  background:var(--green-dim);
-  color:var(--green);
-}
-
-/* Search */
-.search-bar{
-  margin-bottom:16px;
-  display:flex;
-  gap:10px;
-}
-
-.search-bar input{
-  flex:1;
-  font-family:var(--mono);
-  font-size:0.8rem;
-  padding:10px 14px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:4px;
-  color:#fff;
-  outline:none;
-  transition:border-color 0.2s;
-}
-
-.search-bar input:focus{border-color:var(--green)}
-
-.search-bar input::placeholder{color:var(--text-dim)}
-
-/* Tab panel */
-.tab-panel{display:none}
-.tab-panel.active{display:block}
+/* Config Editor specific */
+.container{max-width:960px}
 
 /* Group */
 .group{
@@ -514,60 +211,7 @@ body::before{
   color:var(--text-dim);
 }
 
-/* Header top row */
-.header-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-/* Language toggle */
-.lang-toggle{
-  font-family:var(--mono);
-  font-size:0.65rem;
-  font-weight:500;
-  padding:4px 10px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  background:transparent;
-  color:var(--text-dim);
-  cursor:pointer;
-  transition:all 0.2s;
-  letter-spacing:0.05em;
-}
-
-.lang-toggle:hover{
-  border-color:var(--text-dim);
-  color:var(--text);
-}
-
-/* Footer */
-.footer{
-  margin-top:48px;
-  padding-top:24px;
-  border-top:1px solid var(--border);
-  font-family:var(--mono);
-  font-size:0.65rem;
-  color:var(--text-dim);
-  text-align:center;
-  letter-spacing:0.05em;
-}
-
-/* Animations */
-@keyframes fadeSlideDown{
-  from{opacity:0;transform:translateY(-12px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-@keyframes fadeSlideUp{
-  from{opacity:0;transform:translateY(12px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-@keyframes pulse{
-  0%,100%{opacity:1}
-  50%{opacity:0.4}
-}
+.footer{margin-top:48px;padding-top:24px}
 </style>
 </head>
 <body style="opacity:0">
@@ -579,7 +223,7 @@ body::before{
     <p data-i18n="loginSubtitle">Enter admin token</p>
     <div class="error-msg" id="loginError" data-i18n="invalidToken">Invalid token</div>
     <input type="password" id="tokenInput" data-i18n-placeholder="tokenPh" placeholder="Admin Token" autofocus>
-    <button class="btn" style="width:100%" data-i18n="login" onclick="doLogin()">Login</button>
+    <button class="btn" style="width:100%" data-i18n="login" onclick="auth.doLogin()">Login</button>
   </div>
 </div>
 
@@ -588,12 +232,11 @@ body::before{
   <header class="header">
     <div class="header-top">
       <div class="header-label" data-i18n="headerLabel">Config Editor</div>
-      <button class="lang-toggle" id="langToggle" onclick="toggleLang()">EN</button>
+      <button class="lang-toggle" id="langToggle" onclick="doToggleLang()">EN</button>
     </div>
     <h1 class="header-title">TVBox <span>Config</span></h1>
     <div class="header-nav">
       <a href="/admin" data-i18n="navAdmin">Admin</a>
-      <a href="/admin/config-editor" data-i18n="navConfigEditor">Config Editor</a>
       <a href="/status" data-i18n="navDashboard">Dashboard</a>
     </div>
   </header>
@@ -634,6 +277,8 @@ body::before{
 </div>
 
 <script>
+${sharedUi}
+
 // --- i18n ---
 const _translations = {
   en: {
@@ -664,7 +309,7 @@ const _translations = {
     loginTitle:'配置编辑器', loginSubtitle:'请输入管理令牌',
     invalidToken:'无效的令牌', tokenPh:'管理令牌', login:'登录',
     networkError:'网络错误',
-    headerLabel:'配置编辑器', navAdmin:'管理', navConfigEditor:'配置编辑', navDashboard:'仪表盘',
+    headerLabel:'配置编辑器', navAdmin:'管理', navDashboard:'仪表盘',
     searchPh:'搜索名称、API、URL...', loading:'加载中...',
     available:'可用:', blocked:'已屏蔽:',
     sites:'站点', parses:'解析', lives:'直播',
@@ -686,42 +331,23 @@ const _translations = {
   }
 };
 
-function getLang() {
-  const s = localStorage.getItem('lang');
-  if (s === 'en' || s === 'zh') return s;
-  return navigator.language?.startsWith('zh') ? 'zh' : 'en';
-}
-
 function _t(key) { const l = getLang(); return _translations[l]?.[key] || _translations.en[key] || key; }
 
-function applyLang(lang) {
-  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const k = el.dataset.i18n;
-    const v = _translations[lang]?.[k];
-    if (v) el.innerHTML = v;
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const k = el.dataset.i18nPlaceholder;
-    const v = _translations[lang]?.[k];
-    if (v) el.placeholder = v;
-  });
-  const toggle = document.getElementById('langToggle');
-  if (toggle) toggle.textContent = lang === 'zh' ? 'EN' : '中文';
-  document.body.style.opacity = '1';
-}
-
-function toggleLang() {
+function doToggleLang() {
   const next = getLang() === 'zh' ? 'en' : 'zh';
   localStorage.setItem('lang', next);
-  applyLang(next);
+  applyLang(_translations, next);
   if (DATA) render();
 }
 
-const $ = id => document.getElementById(id);
 let TOKEN = '';
 let DATA = null;
 let CURRENT_TAB = 'sites';
+
+const auth = initAuth('tokenInput', 'loginError', 'loginOverlay', 'mainContent', '/admin/config-data', function() {
+  TOKEN = auth.getToken();
+  loadData();
+});
 
 const SITE_TYPE_TIPS = {
   0: () => _t('siteType0'),
@@ -743,7 +369,6 @@ const LIVE_TYPE_TIPS = {
   3: () => _t('liveType3'),
 };
 
-// Spider class grouping
 function groupSites(sites) {
   const groups = new Map();
   for (const s of sites) {
@@ -757,18 +382,8 @@ function groupSites(sites) {
     if (!groups.has(group)) groups.set(group, []);
     groups.get(group).push(s);
   }
-  // Sort by group size desc
   return [...groups.entries()].sort((a, b) => b[1].length - a[1].length);
 }
-
-// Login
-function doLogin() {
-  TOKEN = $('tokenInput').value.trim();
-  if (!TOKEN) return;
-  loadData();
-}
-
-$('tokenInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 async function loadData() {
   try {
@@ -832,8 +447,6 @@ function renderSites() {
   const groups = groupSites(DATA.sites);
   let html = '';
   for (const [groupName, sites] of groups) {
-    const blockedCount = sites.filter(s => s.blocked).length;
-    const label = groupName + (blockedCount > 0 ? ' (' + blockedCount + ' blocked)' : '');
     html += '<div class="group" data-group="' + groupName + '">'
       + '<div class="group-header" onclick="toggleGroup(this)">'
       + '<div class="group-title">' + esc(groupName) + ' <span class="count">' + sites.length + '</span></div>'
@@ -911,11 +524,6 @@ function liveRow(l) {
     + '</div>';
 }
 
-function esc(s) {
-  if (!s) return '';
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
 function toggleGroup(el) {
   el.parentElement.classList.toggle('open');
 }
@@ -928,7 +536,6 @@ function doSearch() {
     const text = (item.dataset.search || '').toLowerCase();
     item.style.display = (!q || text.includes(q)) ? '' : 'none';
   });
-  // Also hide empty groups
   panel.querySelectorAll('.group').forEach(g => {
     const visible = g.querySelectorAll('.item:not([style*="display: none"])').length;
     g.style.display = visible > 0 ? '' : 'none';
@@ -943,7 +550,6 @@ async function block(type, id) {
       body: JSON.stringify({ type, id })
     });
     if (!res.ok) { alert('Failed: ' + (await res.json()).error); return; }
-    // Update local state
     if (type === 'sites') {
       const s = DATA.sites.find(s => s.fingerprint === id);
       if (s) s.blocked = true;
@@ -986,21 +592,7 @@ async function unblock(type, id) {
   } catch (e) { alert('Network error'); }
 }
 
-applyLang(getLang());
-
-// Check for saved token
-const saved = sessionStorage.getItem('admin_token');
-if (saved) {
-  TOKEN = saved;
-  loadData();
-}
-
-function doLogin() {
-  TOKEN = $('tokenInput').value.trim();
-  if (!TOKEN) return;
-  sessionStorage.setItem('admin_token', TOKEN);
-  loadData();
-}
+applyLang(_translations, getLang());
 </script>
 </body>
 </html>`;
