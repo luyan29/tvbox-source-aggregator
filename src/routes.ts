@@ -2,7 +2,7 @@
 
 import { Hono } from 'hono';
 import type { Storage } from './storage/interface';
-import type { AppConfig, SourceEntry, MacCMSSourceEntry, LiveSourceEntry, NameTransformConfig } from './core/types';
+import type { AppConfig, SourceEntry, MacCMSSourceEntry, LiveSourceEntry, NameTransformConfig, EdgeProxyConfig } from './core/types';
 import { KV_MERGED_CONFIG, KV_MERGED_CONFIG_FULL, KV_MANUAL_SOURCES, KV_LAST_UPDATE, KV_MACCMS_SOURCES, KV_LIVE_SOURCES, KV_BLACKLIST, LIVE_PROXY_TTL, IMG_PROXY_TTL, KV_INLINE_PREFIX, KV_NAME_TRANSFORM, KV_CRON_INTERVAL, DEFAULT_CRON_INTERVAL, KV_SOURCE_HEALTH, KV_SPEED_TEST_ENABLED, KV_EDGE_PROXIES, KV_SEARCH_QUOTA_REPORT } from './core/config';
 import { parseConfigJson, isMultiRepoConfig, extractMultiRepoEntries } from './core/fetcher';
 import { decodeConfigResponse } from './core/decoder';
@@ -729,24 +729,62 @@ export function createApp(deps: AppDeps): Hono {
         return c.json({ error: 'Unknown MacCMS source' }, 404);
       }
 
-      try {
-        const targetUrl = new URL(source.api);
-        const reqUrl = new URL(c.req.url);
-        reqUrl.searchParams.forEach((v, k) => targetUrl.searchParams.set(k, v));
+      const targetUrl = new URL(source.api);
+      const reqUrl = new URL(c.req.url);
+      reqUrl.searchParams.forEach((v, k) => targetUrl.searchParams.set(k, v));
 
-        const resp = await fetch(targetUrl.toString(), {
-          headers: { 'User-Agent': 'okhttp/3.12.0' },
-        });
-        const data = await resp.json();
+      // 构造候选请求链：本地模式下优先走 edge（Vercel → CF），兜底直连
+      const attempts: { label: string; url: string; headers: Record<string, string> }[] = [];
 
-        return c.json(data, 200, {
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'public, max-age=300',
-        });
-      } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : String(error);
-        return c.json({ error: msg }, 502);
+      if (!config.workerBaseUrl) {
+        const edgeRaw = await storage.get(KV_EDGE_PROXIES);
+        if (edgeRaw) {
+          const edge: EdgeProxyConfig = JSON.parse(edgeRaw);
+          const encoded = encodeURIComponent(targetUrl.toString());
+          if (edge.vercel) {
+            attempts.push({
+              label: 'vercel',
+              url: `${edge.vercel.replace(/\/$/, '')}/api/proxy?url=${encoded}`,
+              headers: {},
+            });
+          }
+          if (edge.cf) {
+            attempts.push({
+              label: 'cf',
+              url: `${edge.cf.replace(/\/$/, '')}/fetch-proxy?url=${encoded}`,
+              headers: config.adminToken ? { Authorization: `Bearer ${config.adminToken}` } : {},
+            });
+          }
+        }
       }
+
+      attempts.push({ label: 'direct', url: targetUrl.toString(), headers: {} });
+
+      let lastError = '';
+      for (const { label, url, headers } of attempts) {
+        try {
+          const resp = await fetch(url, {
+            headers: { 'User-Agent': 'okhttp/3.12.0', ...headers },
+            signal: AbortSignal.timeout(8000),
+          });
+          if (!resp.ok) {
+            lastError = `upstream ${resp.status}`;
+            console.log(`[maccms-proxy] ${key} via ${label} fail: ${lastError}`);
+            continue;
+          }
+          const data = await resp.json();
+          console.log(`[maccms-proxy] ${key} via ${label} ok`);
+          return c.json(data, 200, {
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=300',
+          });
+        } catch (error: unknown) {
+          lastError = error instanceof Error ? error.message : String(error);
+          console.log(`[maccms-proxy] ${key} via ${label} fail: ${lastError}`);
+        }
+      }
+
+      return c.json({ error: lastError || 'All proxies failed' }, 502);
     });
   }
 
